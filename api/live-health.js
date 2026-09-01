@@ -23,11 +23,9 @@ module.exports = async function handler(req, res) {
         'x-goog-api-key': key,
       },
       body: JSON.stringify({
-        authToken: {
-          uses: 1,
-          expireTime,
-          newSessionExpireTime,
-        },
+        uses: 1,
+        expireTime,
+        newSessionExpireTime,
       }),
       signal: controller.signal,
     });
