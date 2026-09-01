@@ -5,7 +5,7 @@ module.exports = async function handler(req, res) {
   }
 
   const key = process.env.GEMINI_API_KEY;
-  if (!key) return res.status(500).json({ error: 'GEMINI_API_KEY is not configured' });
+  if (!key) return res.status(500).json({ error: 'GEMINI_API_KEY is not configured', stage: 'environment' });
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 10000);
@@ -21,11 +21,9 @@ module.exports = async function handler(req, res) {
         'x-goog-api-key': key,
       },
       body: JSON.stringify({
-        authToken: {
-          uses: 1,
-          expireTime,
-          newSessionExpireTime,
-        },
+        uses: 1,
+        expireTime,
+        newSessionExpireTime,
       }),
       signal: controller.signal,
     });
@@ -36,7 +34,7 @@ module.exports = async function handler(req, res) {
     if (!response.ok || !data?.name) {
       console.error('Live token error', response.status, JSON.stringify(data));
       return res.status(502).json({
-        error: 'Could not create Live API token',
+        error: data?.error?.message || 'Could not create Live API token',
         stage: 'token',
         upstreamStatus: response.status,
       });
