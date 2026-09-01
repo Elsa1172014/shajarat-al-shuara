@@ -4,43 +4,51 @@ const SYSTEM_PROMPT = `أنت «الراوي»، مساعد صوتي تعليم�
 1. تحدث بالعربية الفصحى المعاصرة الواضحة فقط، ولا تستخدم العامية مطلقًا.
 2. أجب بصياغة تصلح للإلقاء الصوتي: جمل طبيعية مترابطة، بلا Markdown، وبلا جداول، وبلا عناوين زخرفية.
 3. اجمع في الإجابة بين الدقة العلمية والتاريخية، والتحليل الأدبي، واللمسة البلاغية المناسبة للسؤال، من غير مبالغة أو اختلاق.
-4. عند السؤال عن شاعر أو عصر أو معلومة تاريخية أو نقدية، استخدم البحث للتحقق والتوسّع عندما يكون متاحًا. وإذا تعذر البحث، أجب من معرفتك الموثوقة ولا تتوقف عن الحوار، مع تجنب الادعاء بأنك تحققت من الويب.
-5. ميّز بوضوح بين المعلومة التاريخية الموثقة، والتفسير النقدي، والمحاكاة التعليمية.
-6. إذا كان السؤال «من أنت؟» أو ما شابهه، فعرّف نفسك بدقة: أنت مساعد صوتي بالذكاء الاصطناعي اسمه الراوي، صُممت لمرافقة المتعلم في رحلة الشعر العربي، وتستعين بالبحث في الويب عندما يلزم، ولست شاعرًا تاريخيًا ولا إنسانًا حقيقيًا.
-7. لا تدّع أنك شاهدت أو عشت عصرًا تاريخيًا.
-8. إذا طُلبت محاكاة شاعر، اذكر في بداية أول إجابة أنها محاكاة تعليمية مبنية على المصادر وليست كلامًا حقيقيًا للشاعر.
-9. لا تنقل قصائد حديثة طويلة أو نصوصًا محمية؛ اكتفِ بمقتطفات قصيرة جدًا عند الحاجة ثم حلّلها.
-10. اجعل الإجابة عادة بين 70 و160 كلمة ما لم يطلب المستخدم تفصيلًا أكبر.
-11. لا تذكر روابط أو رموز إحالة أثناء الكلام إلا إذا سأل المستخدم عن المصادر؛ عندها اذكر أسماء المصادر أو الجهات باختصار وبأسلوب يصلح للصوت.
-12. تابع سياق المحادثة السابقة ولا تجبر المستخدم على إعادة موضوعه.
-13. لا تقل للمستخدم إنك غير قادر على الوصول إلى محرك البحث إلا إذا كان السؤال يعتمد حصراً على معلومة آنية لا يمكنك تقديمها بدقة من دون تحقق.
+4. في الأسئلة الأدبية المعروفة عن الشعراء والعصور والبلاغة والنقد، أجب مباشرة من معرفتك الموثوقة ولا تؤخر الإجابة بسبب البحث.
+5. استخدم البحث في الويب فقط عندما يطلب المستخدم صراحة التحقق أو المصادر أو معلومة حديثة، أو عندما تكون المعلومة غير مستقرة زمنيًا.
+6. ميّز بوضوح بين المعلومة التاريخية الموثقة، والتفسير النقدي، والمحاكاة التعليمية.
+7. إذا كان السؤال «من أنت؟» أو ما شابهه، فعرّف نفسك بدقة: أنت مساعد صوتي بالذكاء الاصطناعي اسمه الراوي، صُممت لمرافقة المتعلم في رحلة الشعر العربي، ولست شاعرًا تاريخيًا ولا إنسانًا حقيقيًا.
+8. لا تدّع أنك شاهدت أو عشت عصرًا تاريخيًا.
+9. إذا طُلبت محاكاة شاعر، اذكر في بداية أول إجابة أنها محاكاة تعليمية مبنية على المصادر وليست كلامًا حقيقيًا للشاعر.
+10. لا تنقل قصائد حديثة طويلة أو نصوصًا محمية؛ اكتفِ بمقتطفات قصيرة جدًا عند الحاجة ثم حلّلها.
+11. اجعل الإجابة عادة بين 55 و120 كلمة، وابدأ بجواب مباشر خلال الجملة الأولى.
+12. لا تذكر روابط أو رموز إحالة أثناء الكلام إلا إذا سأل المستخدم عن المصادر.
+13. تابع سياق المحادثة السابقة ولا تجبر المستخدم على إعادة موضوعه.
+14. لا تقل مطلقًا «تعذر الوصول إلى محرك البحث» في سؤال أدبي عادي. إذا تعذر البحث فاستمر من معرفتك العامة الموثوقة.
 
-هدفك أن يشعر الطالب أنه يحاور أديبًا رقميًا واسع المعرفة: دقيق، فصيح، هادئ، ناقد، ومعلّم.`;
+هدفك أن يشعر الطالب أنه يحاور أديبًا رقميًا واسع المعرفة: سريع، دقيق، فصيح، هادئ، ناقد، ومعلّم.`;
 
-async function callGemini({ key, contents, withSearch }) {
-  const endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+function needsWebSearch(message) {
+  const text = String(message || '');
+  return /(ابحث|تحقق|المصدر|المصادر|مرجع|مراجع|حديث|حديثة|اليوم|الآن|اخر|آخر|أحدث|الويب|الانترنت|الإنترنت)/i.test(text);
+}
+
+async function callGemini({ key, contents, model, withSearch = false, timeoutMs = 9000 }) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
   const body = {
     systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
     contents,
-    generationConfig: {
-      temperature: 0.35,
-      maxOutputTokens: 700
-    }
+    generationConfig: { temperature: 0.28, maxOutputTokens: 430 }
   };
   if (withSearch) body.tools = [{ google_search: {} }];
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-goog-api-key': key
-    },
-    body: JSON.stringify(body)
-  });
-
-  let data = {};
-  try { data = await response.json(); } catch (_) {}
-  return { response, data };
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+    let data = {};
+    try { data = await response.json(); } catch (_) {}
+    return { ok: response.ok, status: response.status, data };
+  } catch (error) {
+    return { ok: false, status: 0, data: { error: String(error?.message || error) } };
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function extractReply(data) {
@@ -62,34 +70,40 @@ module.exports = async function handler(req, res) {
     if (!message || typeof message !== 'string') return res.status(400).json({ error: 'Missing message' });
 
     const contents = [];
-    for (const item of Array.isArray(history) ? history.slice(-10) : []) {
+    for (const item of Array.isArray(history) ? history.slice(-8) : []) {
       if (!item || !item.text) continue;
-      contents.push({
-        role: item.role === 'model' ? 'model' : 'user',
-        parts: [{ text: String(item.text).slice(0, 6000) }]
-      });
+      contents.push({ role: item.role === 'model' ? 'model' : 'user', parts: [{ text: String(item.text).slice(0, 3500) }] });
     }
-    contents.push({ role: 'user', parts: [{ text: message.slice(0, 6000) }] });
+    contents.push({ role: 'user', parts: [{ text: message.slice(0, 3500) }] });
 
-    // المحاولة الأولى: إجابة مع بحث Google grounding.
-    let attempt = await callGemini({ key, contents, withSearch: true });
-    let reply = attempt.response.ok ? extractReply(attempt.data) : '';
+    const useSearch = needsWebSearch(message);
+    let attempt;
 
-    // إذا تعذر البحث أو كانت أداة grounding غير متاحة/تجاوزت الحصة، نجيب فورًا
-    // من النموذج نفسه من دون أداة البحث حتى لا تنقطع المحادثة.
-    if (!attempt.response.ok || !reply) {
-      console.error('Grounded Gemini attempt failed', attempt.response.status, JSON.stringify(attempt.data));
-      attempt = await callGemini({ key, contents, withSearch: false });
-      reply = attempt.response.ok ? extractReply(attempt.data) : '';
+    // المسار السريع: الأسئلة الأدبية العادية لا تحتاج بحثًا في كل مرة.
+    if (!useSearch) {
+      attempt = await callGemini({ key, contents, model: 'gemini-2.5-flash', withSearch: false, timeoutMs: 7500 });
+      let reply = attempt.ok ? extractReply(attempt.data) : '';
+      if (reply) return res.status(200).json({ reply });
+
+      // مسار احتياطي أخف وأسرع إذا تعذر النموذج الأول.
+      console.error('Primary Gemini failed', attempt.status, JSON.stringify(attempt.data));
+      attempt = await callGemini({ key, contents, model: 'gemini-2.5-flash-lite', withSearch: false, timeoutMs: 6500 });
+      reply = attempt.ok ? extractReply(attempt.data) : '';
+      if (reply) return res.status(200).json({ reply });
+    } else {
+      // البحث يُستخدم فقط عند طلبه أو عند الحاجة إلى معلومة آنية.
+      attempt = await callGemini({ key, contents, model: 'gemini-2.5-flash', withSearch: true, timeoutMs: 9000 });
+      let reply = attempt.ok ? extractReply(attempt.data) : '';
+      if (reply) return res.status(200).json({ reply });
+
+      console.error('Grounded Gemini failed', attempt.status, JSON.stringify(attempt.data));
+      attempt = await callGemini({ key, contents, model: 'gemini-2.5-flash', withSearch: false, timeoutMs: 7000 });
+      reply = attempt.ok ? extractReply(attempt.data) : '';
+      if (reply) return res.status(200).json({ reply });
     }
 
-    if (!attempt.response.ok) {
-      console.error('Gemini fallback failed', attempt.response.status, JSON.stringify(attempt.data));
-      return res.status(502).json({ error: 'AI service error' });
-    }
-
-    if (!reply) return res.status(502).json({ error: 'Empty AI response' });
-    return res.status(200).json({ reply });
+    console.error('All Gemini attempts failed', attempt?.status, JSON.stringify(attempt?.data || {}));
+    return res.status(502).json({ error: 'AI temporarily unavailable' });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Unexpected server error' });
